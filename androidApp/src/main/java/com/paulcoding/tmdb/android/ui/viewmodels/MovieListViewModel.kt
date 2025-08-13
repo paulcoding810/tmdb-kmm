@@ -45,7 +45,7 @@ class MovieListViewModel(
 
     fun searchMovies(query: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null, movies = emptyList()) }
             try {
                 val movies = searchMoviesUseCase(query)
                 _uiState.update { it.copy(isLoading = false, movies = movies, errorMessage = null) }
