@@ -1,5 +1,7 @@
 package com.paulcoding.tmdb.android.ui.screens
 
+import android.annotation.SuppressLint
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -28,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -97,11 +100,14 @@ fun MovieDetailScreen(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun MovieDetailContent(
     movieDetails: MovieDetails,
     modifier: Modifier = Modifier
 ) {
+    val uriHandler = LocalUriHandler.current
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -210,6 +216,10 @@ fun MovieDetailContent(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
+
+                        modifier = Modifier.clickable {
+                            uriHandler.openUri(homepage.trim())
+                        },
                         text = homepage,
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.primary

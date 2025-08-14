@@ -1,5 +1,6 @@
 package com.paulcoding.tmdb.android.ui.screens
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -125,6 +126,7 @@ fun MovieListScreen(
     }
 }
 
+@SuppressLint("DefaultLocale")
 @Composable
 fun MovieItem(
     movie: Movie,
@@ -152,7 +154,7 @@ fun MovieItem(
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .padding(16.dp)
+                    .padding(16.dp),
             ) {
                 Text(
                     text = movie.title,
@@ -161,23 +163,26 @@ fun MovieItem(
                     maxLines = 2
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.weight(1f))
 
-                movie.year?.let { year ->
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    movie.year?.let { year ->
+                        Text(
+                            text = year,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                     Text(
-                        text = year,
+                        text = "★ ${String.format("%.1f", movie.voteAverage)}",
                         fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "★ ${String.format("%.1f", movie.voteAverage)}",
-                    fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
             }
         }
     }
