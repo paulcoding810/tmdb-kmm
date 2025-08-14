@@ -40,9 +40,24 @@ jobs:
       - name: Build Android APK
         run: ./gradlew androidApp:assembleRelease
 
+      - name: Sign APK
+        id: sign_app
+        uses: ilharp/sign-android-release@nightly
+        with:
+          releaseDir: androidApp/build/outputs/apk/release
+          signingKey: ${{ secrets.SIGNING_KEY }}
+          keyAlias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          buildToolsVersion: ${{ env.ANDROID_BUILD_TOOLS_VERSION }}
+
+      - name: Rename apks
+        run: |
+          cp ${{ env.ANDROID_SIGNED_FILE }} ./TMDB.apk
+
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: app-release
-          path: androidApp/build/outputs/apk/release/
+          name: tmdb-apk
+          path: ./TMDB.apk
           retention-days: 30
