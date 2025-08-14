@@ -3,6 +3,7 @@ package com.paulcoding.tmdb.di
 import app.cash.sqldelight.ColumnAdapter
 import com.paulcoding.tmdb.data.api.TmdbApi
 import com.paulcoding.tmdb.data.db.AppDatabase
+import com.paulcoding.tmdb.data.model.ApiErrorResponse
 import com.paulcoding.tmdb.data.repository.MovieRepositoryImpl
 import com.paulcoding.tmdb.db.Movie_details_cache
 import com.paulcoding.tmdb.db.TMDBDatabase
@@ -14,14 +15,19 @@ import com.paulcoding.tmdb.domain.usecase.GetTrendingMoviesUseCase
 import com.paulcoding.tmdb.domain.usecase.SearchMoviesUseCase
 import com.paulcoding.tmdb.tmdbApiKey
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.HttpSend
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.logging.SIMPLE
+import io.ktor.client.plugins.plugin
 import io.ktor.client.request.header
+import io.ktor.client.statement.bodyAsText
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
@@ -55,6 +61,30 @@ val sharedModule = module {
             install(Logging) {
                 level = LogLevel.ALL
                 logger = Logger.SIMPLE
+            }
+            HttpResponseValidator {
+                handleResponseExceptionWithRequest { cause, _ ->
+                    when (cause) {
+                        is UnresolvedAddressException -> throw Exception("No internet connection")
+                    }
+                }
+            }
+        }.apply {
+            plugin(HttpSend).intercept { request ->
+                val originalCall = execute(request)
+                if (originalCall.response.status.value !in 100..399) {
+                    val errorBody = originalCall.response.bodyAsText()
+
+                    val statusMsg = try {
+                        get<Json>().decodeFromString<ApiErrorResponse>(errorBody).status_message
+                    } catch (_: Exception) {
+                        null
+                    }
+
+                    throw Exception(statusMsg ?: errorBody)
+                } else {
+                    originalCall
+                }
             }
         }
     }

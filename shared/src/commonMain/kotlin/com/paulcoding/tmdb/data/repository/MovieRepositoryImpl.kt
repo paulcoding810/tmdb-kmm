@@ -28,29 +28,24 @@ class MovieRepositoryImpl(
         return@withContext if (cache != null && isCacheFresh(cache.timestamp)) {
             parseMoviesJson(cache.data_)
         } else {
-            try {
-                val moviesDto = api.fetchTrendingMovies()
-                val moviesJson = json.encodeToString(
-                    ListSerializer(com.paulcoding.tmdb.data.model.MovieDto.serializer()),
-                    moviesDto
-                )
-                db.databaseQueries.insertOrReplaceTrending(moviesJson, Clock.System.now())
-                moviesDto.map { it.toDomain() }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                cache?.let { parseMoviesJson(it.data_) } ?: emptyList()
-            }
+            // try {
+            val moviesDto = api.fetchTrendingMovies()
+            val moviesJson = json.encodeToString(
+                ListSerializer(com.paulcoding.tmdb.data.model.MovieDto.serializer()),
+                moviesDto
+            )
+            db.databaseQueries.insertOrReplaceTrending(moviesJson, Clock.System.now())
+            moviesDto.map { it.toDomain() }
+            // } catch (e: Exception) {
+            //     e.printStackTrace()
+            //     cache?.let { parseMoviesJson(it.data_) } ?: emptyList()
+            // }
         }
     }
 
     override suspend fun searchMovies(query: String): List<Movie> = withContext(Dispatchers.IO) {
-        try {
-            val moviesDto = api.searchMovies(query)
-            moviesDto.map { it.toDomain() }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
+        val moviesDto = api.searchMovies(query)
+        moviesDto.map { it.toDomain() }
     }
 
     override suspend fun getMovieDetails(movieId: Int): MovieDetails = withContext(Dispatchers.IO) {
@@ -58,22 +53,17 @@ class MovieRepositoryImpl(
         return@withContext if (cache != null) {
             parseMovieDetailsJson(cache.data_)
         } else {
-            try {
-                val details = api.fetchMovieDetails(movieId)
-                val detailsJson = json.encodeToString(
-                    com.paulcoding.tmdb.data.model.MovieDetailsDto.serializer(),
-                    details
-                )
-                db.databaseQueries.insertOrReplaceMovieDetails(
-                    movieId.toLong(),
-                    detailsJson,
-                    Clock.System.now()
-                )
-                details.toDomain()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                throw e
-            }
+            val details = api.fetchMovieDetails(movieId)
+            val detailsJson = json.encodeToString(
+                com.paulcoding.tmdb.data.model.MovieDetailsDto.serializer(),
+                details
+            )
+            db.databaseQueries.insertOrReplaceMovieDetails(
+                movieId.toLong(),
+                detailsJson,
+                Clock.System.now()
+            )
+            details.toDomain()
         }
     }
 
