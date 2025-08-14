@@ -27,10 +27,12 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            resValue("string", "app_name", "TMDB")
         }
         getByName("debug") {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            resValue("string", "app_name", "TMDB Dev")
         }
     }
     compileOptions {
