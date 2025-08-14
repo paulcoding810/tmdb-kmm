@@ -76,6 +76,5 @@ Get the Android APK from CI/CD pipeline:
 - **[Kotlinx Serialization](https://ktor.io/docs/kotlin-serialization.html)** - JSON serialization
 - **[Ktor](https://ktor.io/)** - HTTP client for networking
 - **[SQLDelight](https://github.com/cashapp/sqldelight/)** - Database and local storage
-- **[Coroutines Extensions](https://cashapp.github.io/sqldelight/js_sqlite/coroutines/)** -
-  Flow-based database queries
+
 
