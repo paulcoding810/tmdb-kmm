@@ -17,6 +17,7 @@ import com.paulcoding.tmdb.tmdbApiKey
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpSend
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.logging.LogLevel
@@ -55,7 +56,7 @@ val sharedModule = module {
             install(ContentNegotiation) {
                 json(get())
             }
-            install(io.ktor.client.plugins.HttpTimeout) {
+            install(HttpTimeout) {
                 requestTimeoutMillis = 30_000
             }
             install(Logging) {

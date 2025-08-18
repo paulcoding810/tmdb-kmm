@@ -2,7 +2,10 @@ package com.paulcoding.tmdb.data.repository
 
 import com.paulcoding.tmdb.data.api.TmdbApi
 import com.paulcoding.tmdb.data.db.AppDatabase
+import com.paulcoding.tmdb.data.model.GenreDto
+import com.paulcoding.tmdb.data.model.MovieDetailsDto
 import com.paulcoding.tmdb.data.model.MovieDto
+import com.paulcoding.tmdb.data.model.ProductionCompanyDto
 import com.paulcoding.tmdb.domain.model.Genre
 import com.paulcoding.tmdb.domain.model.Movie
 import com.paulcoding.tmdb.domain.model.MovieDetails
@@ -28,18 +31,13 @@ class MovieRepositoryImpl(
         return@withContext if (cache != null && isCacheFresh(cache.timestamp)) {
             parseMoviesJson(cache.data_)
         } else {
-            // try {
             val moviesDto = api.fetchTrendingMovies()
             val moviesJson = json.encodeToString(
-                ListSerializer(com.paulcoding.tmdb.data.model.MovieDto.serializer()),
+                ListSerializer(MovieDto.serializer()),
                 moviesDto
             )
             db.databaseQueries.insertOrReplaceTrending(moviesJson, Clock.System.now())
             moviesDto.map { it.toDomain() }
-            // } catch (e: Exception) {
-            //     e.printStackTrace()
-            //     cache?.let { parseMoviesJson(it.data_) } ?: emptyList()
-            // }
         }
     }
 
@@ -55,7 +53,7 @@ class MovieRepositoryImpl(
         } else {
             val details = api.fetchMovieDetails(movieId)
             val detailsJson = json.encodeToString(
-                com.paulcoding.tmdb.data.model.MovieDetailsDto.serializer(),
+                MovieDetailsDto.serializer(),
                 details
             )
             db.databaseQueries.insertOrReplaceMovieDetails(
@@ -74,7 +72,7 @@ class MovieRepositoryImpl(
     private fun parseMoviesJson(jsonString: String): List<Movie> {
         return try {
             val moviesDto = json.decodeFromString(
-                ListSerializer(com.paulcoding.tmdb.data.model.MovieDto.serializer()),
+                ListSerializer(MovieDto.serializer()),
                 jsonString
             )
             moviesDto.map { it.toDomain() }
@@ -86,7 +84,7 @@ class MovieRepositoryImpl(
 
     private fun parseMovieDetailsJson(jsonString: String): MovieDetails {
         val detailsDto = json.decodeFromString(
-            com.paulcoding.tmdb.data.model.MovieDetailsDto.serializer(),
+            MovieDetailsDto.serializer(),
             jsonString
         )
         return detailsDto.toDomain()
@@ -105,7 +103,7 @@ private fun MovieDto.toDomain(): Movie {
     )
 }
 
-private fun com.paulcoding.tmdb.data.model.MovieDetailsDto.toDomain(): MovieDetails {
+private fun MovieDetailsDto.toDomain(): MovieDetails {
     return MovieDetails(
         id = id,
         title = title,
@@ -121,10 +119,10 @@ private fun com.paulcoding.tmdb.data.model.MovieDetailsDto.toDomain(): MovieDeta
     )
 }
 
-private fun com.paulcoding.tmdb.data.model.GenreDto.toDomain(): Genre {
+private fun GenreDto.toDomain(): Genre {
     return Genre(id = id, name = name)
 }
 
-private fun com.paulcoding.tmdb.data.model.ProductionCompanyDto.toDomain(): ProductionCompany {
+private fun ProductionCompanyDto.toDomain(): ProductionCompany {
     return ProductionCompany(id = id, name = name, logoPath = logoPath)
 }

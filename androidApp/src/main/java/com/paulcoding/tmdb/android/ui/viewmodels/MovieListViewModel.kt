@@ -22,7 +22,7 @@ class MovieListViewModel(
     private val searchMoviesUseCase: SearchMoviesUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<MovieListUiState>(MovieListUiState())
+    private val _uiState = MutableStateFlow(MovieListUiState())
     val uiState: StateFlow<MovieListUiState> = _uiState.asStateFlow()
 
     fun loadTrendingMovies() {

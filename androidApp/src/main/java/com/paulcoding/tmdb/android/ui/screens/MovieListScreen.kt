@@ -122,6 +122,24 @@ fun MovieListScreen(
                             onClick = { onMovieClick(movie.id) }
                         )
                     }
+                    if (!uiState.isLoading && uiState.movies.isEmpty()) {
+                        item {
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = if (searchQuery.isBlank()) {
+                                        "No trending movies found."
+                                    } else {
+                                        "No results found for $searchQuery."
+                                    },
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                        }
+                    }
                 }
 
             }

@@ -52,9 +52,9 @@ data class MovieDetailsDto(
     val backdropPath: String?,
     val overview: String?,
     val runtime: Int?,
-    val genres: List<com.paulcoding.tmdb.data.model.GenreDto>,
+    val genres: List<GenreDto>,
     @SerialName("production_companies")
-    val productionCompanies: List<com.paulcoding.tmdb.data.model.ProductionCompanyDto>,
+    val productionCompanies: List<ProductionCompanyDto>,
     val homepage: String?
 )
 
